@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #ffeef7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+    }
+    #popup, #gameSection, #finalMessage {
+      text-align: center;
+    }
+    #popup {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    button {
+      padding: 10px 20px;
+      background: #ff4d94;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ff3385;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .card {
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      font-size: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .matched {
+      background: #ffb3d9;
+      pointer-events: none;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+    #finalMessage {
+      display: none;
+      max-width: 800px;
+      padding: 20px;
+      color: #ff2e6e;
+      font-size: 18px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="bgMusic1" src="Assets/Audio1.mp3" preload="auto"></audio>
+  <audio id="bgMusic2" src="Assets/Audio2.mp3" preload="auto"></audio>
+  <audio id="bgMusic3" src="Assets/Audio3.mp3" preload="auto"></audio>
+
+  <div id="popup">
+    <h1>🎉 Happy Birthday Dear! 🎂</h1>
+    <button onclick="startGamePopup()">Let's Go ▶️</button>
+  </div>
+
+  <div id="gameSection" style="display:none;">
+    <h2>Match the Emojis 🤝</h2>
+    <div id="game" class="grid"></div>
+  </div>
+
+  <div id="finalMessage">
+    <div id="typedText"></div>
+  </div>
+
+  <script>
+    const emojis = ["🎂","🎂","🎁","🎁","😍","😍","🎉","🎉","💖","💖","😊","😊","🍫","🍫","✨","✨"];
+    let gameBoard = document.getElementById("game");
+    let opened = [];
+    let matchedCount = 0;
+
+    function startGamePopup() {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("gameSection").style.display = "block";
+      startGame();
+    }
+
+    function startGame() {
+      let shuffled = emojis.sort(() => Math.random() - 0.5);
+      gameBoard.innerHTML = "";
+      shuffled.forEach((emoji) => {
+        let card = document.createElement("div");
+        card.className = "card";
+        card.dataset.emoji = emoji;
+        card.innerHTML = "❔";
+        card.onclick = () => flip(card);
+        gameBoard.appendChild(card);
+      });
+    }
+
+    function flip(card) {
+      if (opened.length === 2 || card.classList.contains("matched") || card.innerHTML !== "❔") return;
+      card.innerHTML = card.dataset.emoji;
+      opened.push(card);
+      if (opened.length === 2) {
+        setTimeout(() => {
+          if (opened[0].dataset.emoji === opened[1].dataset.emoji) {
+            opened.forEach(c => c.classList.add("matched"));
+            matchedCount += 2;
+            if (matchedCount === emojis.length) finishGame();
+          } else {
+            opened.forEach(c => (c.innerHTML = "❔"));
+          }
+          opened = [];
+        }, 700);
+      }
+    }
+
+    function finishGame() {
+      confettiEffect();
+      heartBurst();
+      setTimeout(() => {
+        document.getElementById("gameSection").style.display = "none";
+        document.getElementById("finalMessage").style.display = "block";
+        typeMessage();
+      }, 2000);
+    }
+
+    function confettiEffect() {
+      for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+          let c = document.createElement("div");
+          c.textContent = "💖";
+          c.style.position = "fixed";
+          c.style.left = Math.random() * 100 + "vw";
+          c.style.top = "-5vh";
+          c.style.fontSize = "24px";
+          c.style.animation = "fall 2s linear";
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 2000);
+        }, i * 20);
+      }
+    }
+
+    function heartBurst() {
+      for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+          let h = document.createElement("div");
+          h.textContent = "💞";
+          h.style.position = "fixed";
+          h.style.left = Math.random() * 100 + "vw";
+          h.style.top = Math.random() * 100 + "vh";
+          h.style.fontSize = "20px";
+          document.body.appendChild(h);
+          setTimeout(() => h.remove(), 1500);
+        }, i * 30);
+      }
+    }
+
+    const msgHTML = `<i><b><u><span style="color:darkgreen;">A SPECIAL WISH FOR YOU</span></u></b><i><br><br>
+      <i><b>🎉 Happy Birthday, Mr. P.C.E.C.B.I 🎉</b></i><br><br>
+      <i>Happy birthday, dear!<br><br>
+      ❤💫 On your special day, I just want to say — you entered my life so quietly, like an unexpected gift I never saw coming 🎁💖.<br><br>
+      May Allah bless you with good health, abundant wealth, and endless success 🌙✨.<br><br>
+      May all your dreams come true, and may your life always be filled with happiness, love, and joy 💛.<br><br>
+      You truly deserve a life as bright and beautiful as your smile 😊🌈.<br>
+      Keep shining, keep smiling — because the world is brighter with you in it 🌟.<br>
+      May every moment bring you closer to everything you wish for 💫, and may every step you take lead you toward greater achievements, endless blessings, and boundless happiness 🌿💖.<br><br>
+      Your presence makes the world a better place 🌎✨, and I hope this year brings you more reasons to smile, more dreams to chase, and more love to embrace 💞.<br>
+      Stay blessed, stay happy, and keep being the amazing person you are 🤗.<br><br>
+      Thank you for being you — for your kindness, patience, and the calm you bring into my life 🌈💗.<br>
+      You’re someone who listens, understands, and cares without ever expecting anything in return 💛.<br>
+      You’re not just a memory — you’re a feeling I’ll always carry with gratitude and respect 💖.<br>
+      Words will never be enough to describe how much you mean to me 💫.<br>
+      You’re such a rare person — thank you so much for everything you’ve done 🤍.<br><br>
+      Wishing you the most unforgettable and happiest birthday ever 🎂🎉💛</i>`;
+
+    function typeMessage() {
+      const txt = document.getElementById("typedText");
+      const bg1 = document.getElementById("bgMusic1");
+      const bg2 = document.getElementById("bgMusic2");
+      const bg3 = document.getElementById("bgMusic3");
+
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = msgHTML;
+      const totalText = tempDiv.textContent.trim();
+
+      const totalTime = 89999;
+      const speed = totalTime / totalText.length;
+
+      bg1.addEventListener("ended", () => bg2.play());
+      bg2.addEventListener("ended", () => bg3.play());
+
+      let index = 0;
+      let started = false;
+
+      const typer = setInterval(() => {
+        if (!started) {
+          bg1.play().catch(err => console.log("Audio play blocked:", err));
+          started = true;
+        }
+        txt.innerHTML = msgHTML.slice(0, index);
+        index++;
+        if (index >= msgHTML.length) {
+          clearInterval(typer);
+          [bg1, bg2, bg3].forEach(a => { a.pause(); a.currentTime = 0; });
+        }
+      }, speed);
+    }
+  </script>
+</body>
+</html>
